@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    <title>test</title>
+    <style>
+        .page-center {
+
+            height: 100px;
+
+        }
+    </style>
+</head>
+<div class="page-center"></div>
+<body class="text-center container">
+<div class="display: flex justify-content:center align-items:Center">
+    <form class="form" method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-3">
+                <label class="col-form-label" for="name">试卷名称</label>
+            </div>
+            <div class="col-md-9">
+                <input type="text" class="form-control" id="name" name="name"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-1 offset-1">
+                <label class="col-form-label" for="subject">学科</label>
+            </div>
+            <div class="col-md-3">
+                <select class="custom-select d-block w-100" name="subject" id="subject" required>
+                    {% for subject in subjects %}
+                        <option value="{{ subject.id }}">{{ subject.subject_text }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="col-form-label" for="score">考试时间（分钟）</label>
+            </div>
+            <div class="col-md-2">
+                <input type="number" min="0" class="form-control" value="100" id="time" name="time"/>
+
+            </div>
+            <div class="col-md-1">
+                <label class="col-form-label" for="score">分数</label>
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" value="100" id="score" name="score"/>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <label class="col-form-label" for="example">标签选择</label>
+            </div>
+            <div class="col-md-9">
+
+                <select name="states" id="example" class="form-control" multiple="multiple" style="display: none;">
+                    {% for label in labels %}
+                        <option value="{{ label.id }}">{{ label.label_text }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mx-auto">
+                <h2 class="h2">题目数量</h2>
+            </div>
+        </div>
+        <div class="row">
+            {% for question_type in question_types %}
+                <div class="col-md-4">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" value="{{ question_type.id }}" id="check_{{ question_type.id }}"
+                                       name="check_box_list"
+                                       aria-label="Checkbox for following text input">
+                                <label class="col-form-label">{{ question_type.question_type_text }}</label>
+
+                            </div>
+                        </div>
+                        <input type="number" id="number_{{ question_type.id }}" name="{{ question_type.id }}_num"
+                               min="0"
+                               value="0" class="form-control"
+                               aria-label="Text input with checkbox">
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+        <div class="row">
+            <div class="alert alert-primary col-md-12" role="alert">
+                <label id="counter">共有0题</label>
+            </div>
+        </div>
+        {% buttons %}
+            <div class="row">
+                <div class="col-md-3 offset-4">
+                    <button class="btn btn-primary">提交</button>
+                </div>
+            </div>
+        {% endbuttons %}
+    </form>
+</div>
+{% bootstrap_javascript %}
+<script src="{% bootstrap_popper_url %}"></script>
+{% bootstrap_jquery %}
+{% load static %}
+<script src="{% static "dist/js/BsMultiSelect.js" %}"></script>
+<script src="{% static "admin/simpleui-x/elementui/utils/popper.js" %}"></script>
+<script type="text/javascript">
+    $(function (message) {
+        var num = 0;
+        $("select[multiple='multiple']").bsMultiSelect({
+            selectedPanelDefMinHeight: 'calc(2.25rem + 2px)',  // default size
+            selectedPanelLgMinHeight: 'calc(2.875rem + 2px)',  // LG size
+            selectedPanelSmMinHeight: 'calc(1.8125rem + 2px)', // SM size
+            selectedPanelDisabledBackgroundColor: '#e9ecef',   // disabled background
+            selectedPanelFocusBorderColor: '#80bdff',          // focus border
+            selectedPanelFocusBoxShadow: '0 0 0 0.2rem rgba(0, 123, 255, 0.25)',  // foxus shadow
+            selectedPanelFocusValidBoxShadow: '0 0 0 0.2rem rgba(40, 167, 69, 0.25)',  // valid foxus shadow
+            selectedPanelFocusInvalidBoxShadow: '0 0 0 0.2rem rgba(220, 53, 69, 0.25)',  // invalid foxus shadow
+            inputColor: '#495057', // color of keyboard entered text
+            selectedItemContentDisabledOpacity: '.65' // btn disabled opacity used
+        });
+        $("input[type='checkbox']").click(function () {
+            if ($(this).prop("checked")) {
+                let n = $("#number_" + $(this).val()).val();
+                num += parseInt(n);
+                $("#counter").html("共有" + num + "题");
+            } else {
+                let n = $("#number_" + $(this).val()).val();
+                num -= parseInt(n);
+                $("#counter").html("共有" + num + "题");
+
+            }
+        });
+        $.event.special.valuechange = {
+
+            teardown: function (namespaces) {
+                $(this).unbind('.valuechange');
+            },
+
+            handler: function (e) {
+                $.event.special.valuechange.triggerChanged($(this));
+            },
+
+            add: function (obj) {
+                $(this).on('keyup.valuechange cut.valuechange paste.valuechange input.valuechange', obj.selector, $.event.special.valuechange.handler)
+            },
+
+            triggerChanged: function (element) {
+                var current = element[0].contentEditable === 'true' ? element.html() : element.val()
+                    ,
+                    previous = typeof element.data('previous') === 'undefined' ? element[0].defaultValue : element.data('previous');
+                if (current !== previous) {
+                    element.trigger('valuechange', [element.data('previous')]);
+                    element.data('previous', current)
+                }
+            }
+        };
+        $('input[type="number"]').on('focusin', function () {
+            $(this).data('val', $(this).val());
+        });
+
+        $('input[type="number"]').on('change', function () {
+            var prev = $(this).data('val');
+            var current = $(this).val();
+            var id = $(this).attr('id');
+            var question_type = id.split("_")[1];
+            if ($("#check_" + question_type).is(':checked')) {
+                num =  parseInt(num) + parseInt(current) - parseInt(prev);
+                $(this).data('val',$(this).val());
+                $("#counter").html("共有" + num + "题");
+            }
+        });
+
+    })
+</script>
+</body>
+</html>

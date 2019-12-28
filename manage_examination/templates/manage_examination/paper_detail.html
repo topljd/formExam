@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ object.paper_name }}-试卷详情</title>
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center">{{ object.paper_name }}</h1>
+    <div class="row text-center" >
+        <div class="col-md-4">
+            <h3>出卷人：{{ object.paper_author }}</h3>
+        </div>
+        <div class="col-md-4">
+            <h3>考试时间：{{ object.paper_exam_time }}分钟</h3>
+        </div>
+        <div class="col-md-4">
+            <h3>试卷总分：{{ object.paper_score }}</h3>
+        </div>
+    </div>
+    <ol type="I">
+        {% for type in types %}
+
+            <div class="row">
+                <h4>
+                    <li>{{ type }}</li>
+                </h4>
+            </div>
+
+            <ol type="1">
+                {% for q in object.paper_question.get_queryset %}
+
+                    {% ifequal q.question_type_id type.id %}
+
+
+                        <h5>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <li>
+                                        <div id="md_text_{{ forloop.counter }}" name="md">
+                                            <textarea style="display: none">{{ q.question_text }}</textarea>
+                                        </div>
+                                    </li>
+                                </div>
+
+                                {% ifequal q.question_type.question_type_text '选择题' %}
+                                    <div class="col-md-2">
+                                        (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                                    </div>
+                                {% endifequal %}
+                            </div>
+
+                            {% ifequal q.question_type.question_type_text "选择题" %}
+                                <ol type="A">
+                                    <div class="row">
+
+                                        {% for choice in q.choice_set.get_queryset %}
+
+                                            <div class="col-md-3">
+                                                <li>
+                                                    {{ choice.choice_text }}
+                                                </li>
+                                            </div>
+
+                                        {% endfor %}
+
+                                    </div>
+                                </ol>
+                            {% endifequal %}
+                        </h5>
+
+
+                    {% endifequal %}
+                {% endfor %}
+            </ol>
+
+
+
+
+        {% endfor %}
+    </ol>
+
+
+</div>
+{% load static %}
+<script src={% static "mdeditor/js/jquery.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/marked.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/prettify.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/raphael.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/underscore.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/sequence-diagram.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/flowchart.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/jquery.flowchart.min.js" %}></script>
+<script src={% static "mdeditor/js/editormd.js" %}></script>
+<script type="text/javascript">
+
+
+    $(function () {
+
+        function load_tex(div_id) {
+
+            editormd.markdownToHTML(div_id, {
+                htmlDecode: "style,script,iframe",  // you can filter tags decode
+                emoji: false,
+                taskList: true,
+                tex: true,  // 默认不解析
+                flowChart: true,  // 默认不解析
+                sequenceDiagram: true,  // 默认不解析
+            });
+        }
+        $("div[name='md']").each(function (index, domEle) {
+            load_tex(domEle.id)
+        });
+
+
+
+    });
+</script>
+</body>
+</html>

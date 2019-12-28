@@ -1,0 +1,46 @@
+\documentclass[10pt]{article}
+
+\usepackage{amsmath,amssymb,textcomp,gensymb}
+\usepackage[mathscr]{eucal}
+\usepackage{eufrak}
+\usepackage[papersize={133pt,100pt},margin=0.5pt]{geometry}
+\usepackage{color}
+\usepackage{cancel}
+\usepackage[normalem]{ulem}
+\usepackage{etoolbox}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+
+% Based on LaTeX's definition of \LaTeX, with L changed to K and kerns
+% changed as in src/macros.js
+\DeclareRobustCommand{\KaTeX}{\mbox{%
+K\kern-.17em%
+{\sbox0 T\vbox to\ht0{\hbox%
+  {\fontsize{.75em}{1em}\selectfont A}%
+\vss}}%
+\kern-.15em%
+\TeX}}
+
+% Thanks to http://tex.stackexchange.com/a/26017/16923
+\newtoks\kasizetoks
+\def\kasizecollect#1{\afterassignment\kasizeapply\kasizetoks=\bgroup#1$}
+\def\kasizeapply{\mbox{\the\kasizetoks$\egroup}}
+\def\kasize#1{\csletcs{ka#1}{#1}%
+\csdef{#1}{\ifmmode\expandafter\kasizecollect\csname ka#1\endcsname%
+\else\csname ka#1\endcsname\fi}}
+\kasize{tiny}
+\kasize{scriptsize}
+\kasize{footnotesize}
+\kasize{small}
+\kasize{normalsize}
+\kasize{large}
+\kasize{Large}
+\kasize{LARGE}
+\kasize{huge}
+\kasize{Huge}
+
+\begin{document}
+$...$
+\end{document}

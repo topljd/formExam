@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta charset="UTF-8">
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    <title>test</title>
+    <style>
+
+    </style>
+</head>
+
+<body class="text-center container">
+<div style="height: 100px"></div>
+<form action="" enctype="multipart/form-data" method="POST">
+    {% csrf_token %}
+
+    {% bootstrap_form form %}
+
+    <div class="row">
+        <div class="col-md-4 offset-4">
+            <input type="submit" class="btn btn-lg btn-primary" value="提交"/>
+        </div>
+    </div>
+
+</form>
+{% bootstrap_javascript %}
+</body>
+</html>

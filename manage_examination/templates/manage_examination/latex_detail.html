@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>latex</title>
+    <style type="text/css">
+        #md_text {
+            display: inline-block;
+            *display: inline;
+            *zoom: 1;
+        }
+    </style>
+</head>
+<body>
+<div id="md_text">
+
+    <textarea style="display: none">$${{ latex_text }}$$</textarea>
+</div>
+<form id="form">
+    {% csrf_token %}
+    <div id="img_form">
+
+        <input type="image" src="#" id="img" name="img" alt="图片"/>
+        <input type="text" hidden="hidden" name="img_name" id="img_name" value="{{ latex_text }}"/>
+        <input type="text" hidden="hidden" name="img_raw" id="img_raw" value=""/>
+
+    </div>
+    <input type="button" value="提交" hidden="hidden"/>
+</form>
+
+{% load static %}
+
+<script src={% static "mdeditor/js/jquery.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/marked.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/prettify.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/raphael.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/underscore.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/sequence-diagram.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/flowchart.min.js" %}></script>
+<script src={% static "mdeditor/js/lib/jquery.flowchart.min.js" %}></script>
+<script src={% static "mdeditor/js/editormd.js" %}></script>
+
+<script src={% static "html2canvas-0.5.0/dist/html2canvas.js" %}></script>
+<script type="text/javascript">
+
+
+    function convertCanvasToImage(canvas) {
+        var image = new Image();
+
+        let img_raw = canvas.toDataURL("image/png");
+        image.src = img_raw;
+        $("#img").attr('src', img_raw);
+        $('#img_raw').val(img_raw);
+
+        return image;
+    }
+
+    $(function () {
+        editormd.markdownToHTML("md_text", {
+            htmlDecode: "style,script,iframe",  // you can filter tags decode
+            emoji: false,
+            taskList: true,
+            tex: true,  // 默认不解析
+            flowChart: true,  // 默认不解析
+            sequenceDiagram: true,  // 默认不解析
+        });
+    });
+
+    window.onload = function () {
+                 html2canvas($('#md_text'), {
+
+            onrendered: function (canvas) {
+                convertCanvasToImage(canvas);
+
+                $("#form").submit(function (event) {
+                    event.preventDefault();
+                    $.ajax({
+                        url: "/upload_img/",
+                        type: "POST",
+                        data: new FormData(this),
+                        contentType: false,
+                        processData: false,
+                        success: function (status) {
+                            console.log(status);
+                        }
+                    })
+                });
+                {#$('#form').submit();#}
+
+            }
+        })
+
+    };
+    $(document).ready(function () {
+
+    })
+</script>
+</body>

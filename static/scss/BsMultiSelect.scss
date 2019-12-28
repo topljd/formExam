@@ -1,0 +1,83 @@
+@import "./../node_modules/bootstrap/scss/_functions";
+@import "./../node_modules/bootstrap/scss/mixins/_box-shadow";
+@import "./../node_modules/bootstrap/scss/mixins/_transition";
+@import "./../node_modules/bootstrap/scss/mixins/_forms";
+
+@import "./../node_modules/bootstrap/scss/_variables"; // update it after copy, reference your custom theme variables
+
+@mixin form-control-focus-class() {
+    &.focus {
+        color: $input-focus-color;
+        background-color: $input-focus-bg;
+        border-color: $input-focus-border-color;
+        outline: 0;
+        @if $enable-shadows {
+            box-shadow: $input-box-shadow, $input-focus-box-shadow;
+        } @else {
+            box-shadow: $input-focus-box-shadow;
+        }
+    }
+}
+
+@mixin form-validation-state($state, $color) {
+    ul.form-control{
+        .was-validated &:#{$state},
+        &.is-#{$state} {
+            border-color: $color;
+            &.focus {
+                border-color: $color;
+                box-shadow: 0 0 0 $input-focus-width rgba($color, .25);
+            }
+        }
+    }
+}
+
+ul.form-control {
+    height: auto;
+    min-height: #{$input-height};
+    margin-bottom: 0;
+
+    input {
+        color: $input-color;
+    }
+    &.disabled{
+        background-color: $input-disabled-bg;
+    }
+    .badge {
+        padding-left: 0;
+        line-height: 1.5em;
+        button.close {
+            font-size: 1.5em;
+            line-height: .9em;
+        }
+        span.disabled {
+            opacity: $btn-disabled-opacity;
+        }
+    }
+
+    @include form-control-focus-class();
+
+    &.form-control-sm {
+        min-height: #{$input-height-sm};
+        input{
+            font-size: $font-size-sm;
+        }
+    }
+
+    &.form-control-lg {
+        min-height: #{$input-height-lg};
+        input{
+            font-size: $font-size-lg;
+        }
+    }
+}
+@include form-validation-state("valid", $form-feedback-valid-color);
+@include form-validation-state("invalid", $form-feedback-invalid-color);
+
+ul.dropdown-menu {
+    li{
+        .custom-control-input.disabled ~ .custom-control-label {
+            color: $custom-control-label-disabled-color;
+        }
+    }
+}
